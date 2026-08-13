@@ -9,9 +9,9 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
 
-import main
-from database import get_db
-from models import Base
+from app import main
+from app.database import get_db
+from app.models import Base
 
 
 def _test_database_url():

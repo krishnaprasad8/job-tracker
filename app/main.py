@@ -4,9 +4,9 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from database import engine, get_db
-from models import Application, Base
-from schemas import ApplicationCreate, ApplicationRead, ApplicationUpdate
+from app.database import engine, get_db
+from app.models import Application, Base
+from app.schemas import ApplicationCreate, ApplicationRead, ApplicationUpdate
 
 # Creates any missing tables on startup. Only ever creates — it cannot alter an
 # existing table, which is why Alembic is planned before real data goes live.

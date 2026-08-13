@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from models import ApplicationStatus
+from app.models import ApplicationStatus
 
 
 class ApplicationCreate(BaseModel):
