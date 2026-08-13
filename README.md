@@ -46,7 +46,7 @@ python3.12 -m venv venv
 ./venv/bin/pip install -r requirements.txt
 createdb job_tracker
 cp .env.example .env        # then set DATABASE_URL to your local database
-./venv/bin/uvicorn main:app --reload
+./venv/bin/uvicorn app.main:app --reload
 ```
 
 ## API
@@ -113,10 +113,14 @@ database, not just by the application.
 ## Project structure
 
 ```
-models.py     SQLAlchemy model and status enum
-schemas.py    Pydantic schemas for requests and responses
-database.py   Engine, session factory, per-request session dependency
-main.py       FastAPI app and the five endpoints
+app/
+  models.py     SQLAlchemy model and status enum
+  schemas.py    Pydantic schemas for requests and responses
+  database.py   Engine, session factory, per-request session dependency
+  main.py       FastAPI app and the five endpoints
+tests/
+  conftest.py           test database and client fixtures
+  test_applications.py  endpoint tests
 ```
 
 ## Status and roadmap
