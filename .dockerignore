@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.py[cod]
+
+# Never bake local secrets into the image. Compose supplies these instead.
+.env
+
+.git/
+.gitignore
+CLAUDE.md
+.DS_Store
+.vscode/
+.idea/
