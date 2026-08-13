@@ -1,7 +1,8 @@
 """FastAPI application exposing CRUD endpoints for job applications."""
 
-from fastapi import Depends, FastAPI, HTTPException, status
-from sqlalchemy import select
+from fastapi import Depends, FastAPI, HTTPException, Response, status
+from sqlalchemy import select, text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -9,6 +10,21 @@ from app.models import Application
 from app.schemas import ApplicationCreate, ApplicationRead, ApplicationUpdate
 
 app = FastAPI(title="Job Application Tracker")
+
+
+@app.get("/health")
+def health(response: Response, db: Session = Depends(get_db)) -> dict[str, str]:
+    """Liveness probe for Nginx, uptime monitoring and orchestrators.
+
+    Queries the database rather than returning a constant, so it reports
+    unhealthy when the process is fine but its database is unreachable.
+    """
+    try:
+        db.execute(text("SELECT 1"))
+    except SQLAlchemyError:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {"status": "unhealthy"}
+    return {"status": "ok"}
 
 
 def _get_or_404(db: Session, application_id: int) -> Application:

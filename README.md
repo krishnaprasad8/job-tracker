@@ -54,6 +54,7 @@ cp .env.example .env        # then set DATABASE_URL to your local database
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
+| `GET` | `/health` | Liveness check. `200` if the database responds, `503` if not. |
 | `POST` | `/applications` | Create an application. Returns `201`. |
 | `GET` | `/applications` | List all, newest `applied_date` first. |
 | `GET` | `/applications/{id}` | Fetch one. `404` if not found. |
@@ -83,10 +84,12 @@ leaves every other field untouched.
 ./venv/bin/pytest
 ```
 
-20 tests covering all five endpoints: response codes, status defaulting, the
-optional `notes` field, sort order, partial-update semantics, timestamp
-behaviour, and validation failures (`404` on unknown ids, `422` on an invalid
-status, a missing `applied_date` or an empty company name).
+23 tests covering all five CRUD endpoints plus the health check: response
+codes, status defaulting, the optional `notes` field, sort order,
+partial-update semantics, timestamp behaviour, and validation failures (`404`
+on unknown ids, `422` on an invalid status, a missing `applied_date` or an
+empty company name). The health check is tested both ways — healthy, and with
+the database dependency replaced by one that fails.
 
 Tests run against a real PostgreSQL database rather than SQLite — `status` is a
 native Postgres enum, so SQLite would not exercise the same constraints. A
@@ -144,10 +147,11 @@ app/
   models.py     SQLAlchemy model and status enum
   schemas.py    Pydantic schemas for requests and responses
   database.py   Engine, session factory, per-request session dependency
-  main.py       FastAPI app and the five endpoints
+  main.py       FastAPI app, health check and the five endpoints
 tests/
   conftest.py           test database and client fixtures
-  test_applications.py  endpoint tests
+  test_applications.py  CRUD endpoint tests
+  test_health.py        health check tests
 ```
 
 ## Status and roadmap
@@ -161,6 +165,9 @@ container rebuilds.
 - [x] Docker and Docker Compose
 - [x] Automated tests
 - [x] Alembic migrations
+- [x] Health check endpoint
+- [ ] GitHub Actions CI
+- [ ] Terraform for VPS provisioning
 - [ ] VPS deployment behind Nginx
 - [ ] Authentication and per-user applications
 - [ ] Web frontend
