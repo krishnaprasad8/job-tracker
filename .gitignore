@@ -1,0 +1,24 @@
+# Virtual environment — never commit this.
+# It's thousands of files, it's specific to your Mac, and anyone
+# cloning the repo rebuilds it from requirements.txt instead.
+venv/
+
+# Python bytecode cache. Python generates this automatically when it
+# runs your code. It's throwaway.
+__pycache__/
+*.py[cod]
+
+# Secrets. The real .env holds your database password and must never
+# be committed. .env.example (which IS committed) shows what keys go here.
+.env
+
+# Mac Finder metadata. Harmless, but noisy in a repo.
+.DS_Store
+
+# Editor settings
+.vscode/
+.idea/
+
+# Local-only instructions file for Claude Code. Stays on this machine,
+# never goes to GitHub.
+CLAUDE.md

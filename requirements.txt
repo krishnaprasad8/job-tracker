@@ -1,0 +1,9 @@
+# Direct dependencies only — the packages we installed on purpose.
+# Everything else in the venv (starlette, pydantic, anyio...) gets pulled
+# in automatically as a dependency of these two.
+#
+# Install with:  ./venv/bin/pip install -r requirements.txt
+# After installing anything new, add it here.
+
+fastapi==0.141.1
+uvicorn==0.52.3
