@@ -1,5 +1,7 @@
 # Job Application Tracker
 
+[![Tests](https://github.com/krishnaprasad8/job-tracker/actions/workflows/test.yml/badge.svg)](https://github.com/krishnaprasad8/job-tracker/actions/workflows/test.yml)
+
 A REST API for tracking job applications through their lifecycle — applied,
 interview, offer, rejected. Built with FastAPI and PostgreSQL, running in
 Docker.
@@ -84,6 +86,11 @@ leaves every other field untouched.
 ./venv/bin/pytest
 ```
 
+These also run automatically on every pull request via GitHub Actions, against
+a PostgreSQL 17 service container. The workflow additionally runs `alembic
+check`, which fails the build if `app/models.py` and the migration files have
+drifted apart.
+
 23 tests covering all five CRUD endpoints plus the health check: response
 codes, status defaulting, the optional `notes` field, sort order,
 partial-update semantics, timestamp behaviour, and validation failures (`404`
@@ -166,7 +173,7 @@ container rebuilds.
 - [x] Automated tests
 - [x] Alembic migrations
 - [x] Health check endpoint
-- [ ] GitHub Actions CI
+- [x] GitHub Actions CI
 - [ ] Terraform for VPS provisioning
 - [ ] VPS deployment behind Nginx
 - [ ] Authentication and per-user applications
@@ -179,5 +186,5 @@ address before the app is shared.
 
 Tests build their schema with `create_all` rather than by running migrations,
 so a mismatch between `app/models.py` and `alembic/versions/` would not fail
-the suite. `alembic check` catches that drift and is worth running before
-deploying.
+the suite on its own. CI runs `alembic check` alongside the tests to catch
+exactly that drift.
