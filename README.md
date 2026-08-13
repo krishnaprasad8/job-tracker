@@ -27,8 +27,9 @@ docker compose up --build
 
 Then open **http://localhost:8000/docs** for the interactive API docs.
 
-The database schema is created automatically on first start. Data persists in a
-named Docker volume, so `docker compose down` and back up keeps your records.
+Database migrations run automatically before the app starts, so a fresh
+database builds its own schema. Data persists in a named Docker volume, so
+`docker compose down` and back up keeps your records.
 
 To stop:
 
@@ -92,6 +93,32 @@ native Postgres enum, so SQLite would not exercise the same constraints. A
 `job_tracker_test` database is created automatically on first run and truncated
 between tests.
 
+## Database migrations
+
+Schema changes are managed with Alembic. Migration files live in
+`alembic/versions/` and are applied automatically by `entrypoint.sh` when the
+container starts, so deploying never needs a separate migration step.
+
+To change the schema: edit `app/models.py`, then generate and apply a migration.
+
+```bash
+./venv/bin/alembic revision --autogenerate -m "add salary column"
+./venv/bin/alembic upgrade head
+```
+
+Always read the generated file before applying it. Autogenerate does not handle
+everything — the initial migration needed a manual `DROP TYPE` in `downgrade()`
+because Alembic leaves Postgres enum types behind when dropping a table, which
+makes a subsequent upgrade fail.
+
+Other useful commands:
+
+```bash
+./venv/bin/alembic current       # which version this database is at
+./venv/bin/alembic history       # all migrations
+./venv/bin/alembic downgrade -1  # undo the last one
+```
+
 ## Data model
 
 Single `applications` table:
@@ -133,8 +160,8 @@ container rebuilds.
 - [x] CRUD endpoints
 - [x] Docker and Docker Compose
 - [x] Automated tests
+- [x] Alembic migrations
 - [ ] VPS deployment behind Nginx
-- [ ] Alembic migrations
 - [ ] Authentication and per-user applications
 - [ ] Web frontend
 
@@ -143,6 +170,7 @@ are not scoped to a user — anyone with access to the API can read and modify
 every record. That is fine for local single-user use, and is the next thing to
 address before the app is shared.
 
-Tables are currently created with `create_all` on startup, which creates
-missing tables but cannot alter existing ones. Alembic is planned before any
-real data is deployed.
+Tests build their schema with `create_all` rather than by running migrations,
+so a mismatch between `app/models.py` and `alembic/versions/` would not fail
+the suite. `alembic check` catches that drift and is worth running before
+deploying.
