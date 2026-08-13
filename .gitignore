@@ -8,6 +8,9 @@ venv/
 __pycache__/
 *.py[cod]
 
+# pytest's cache of the last run
+.pytest_cache/
+
 # Secrets. The real .env holds your database password and must never
 # be committed. .env.example (which IS committed) shows what keys go here.
 .env

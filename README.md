@@ -75,6 +75,23 @@ curl -X POST localhost:8000/applications \
 Update is a genuine PATCH — `{"status": "interview"}` changes the status and
 leaves every other field untouched.
 
+## Running the tests
+
+```bash
+./venv/bin/pip install -r requirements-dev.txt
+./venv/bin/pytest
+```
+
+20 tests covering all five endpoints: response codes, status defaulting, the
+optional `notes` field, sort order, partial-update semantics, timestamp
+behaviour, and validation failures (`404` on unknown ids, `422` on an invalid
+status, a missing `applied_date` or an empty company name).
+
+Tests run against a real PostgreSQL database rather than SQLite — `status` is a
+native Postgres enum, so SQLite would not exercise the same constraints. A
+`job_tracker_test` database is created automatically on first run and truncated
+between tests.
+
 ## Data model
 
 Single `applications` table:
@@ -111,6 +128,7 @@ container rebuilds.
 - [x] PostgreSQL connection
 - [x] CRUD endpoints
 - [x] Docker and Docker Compose
+- [x] Automated tests
 - [ ] VPS deployment behind Nginx
 - [ ] Alembic migrations
 - [ ] Authentication and per-user applications

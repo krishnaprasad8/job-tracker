@@ -1,0 +1,8 @@
+# Development and test dependencies only.
+# Deliberately kept out of requirements.txt so the Docker image does not ship
+# test tooling. Install with:  ./venv/bin/pip install -r requirements-dev.txt
+
+-r requirements.txt
+
+pytest==9.1.1
+httpx2==2.10.0
