@@ -3,8 +3,9 @@
 [![Tests](https://github.com/krishnaprasad8/job-tracker/actions/workflows/test.yml/badge.svg)](https://github.com/krishnaprasad8/job-tracker/actions/workflows/test.yml)
 
 A REST API for tracking job applications through their lifecycle — applied,
-interview, offer, rejected. Built with FastAPI and PostgreSQL, running in
-Docker.
+interview, offer, rejected. FastAPI and PostgreSQL, containerised with Docker
+Compose, schema managed by Alembic migrations, and tested against a real
+database on every pull request.
 
 Replaces the spreadsheet I was keeping by hand.
 
@@ -15,6 +16,9 @@ Replaces the spreadsheet I was keeping by hand.
 - **SQLAlchemy 2.0** — ORM, using the modern `Mapped` / `mapped_column` style
 - **Pydantic v2** — request/response validation
 - **Docker Compose** — app and database as containers
+- **Alembic** — versioned schema migrations, applied on container start
+- **pytest** — 23 tests against a real Postgres
+- **GitHub Actions** — tests and migration drift check on every pull request
 
 ## Quick start
 
@@ -161,30 +165,29 @@ tests/
   test_health.py        health check tests
 ```
 
-## Status and roadmap
+## Scope
 
-Working: full CRUD against PostgreSQL, containerised, data persisting across
-container rebuilds.
+A complete, locally-runnable API. There is no hosted instance — it runs on your
+machine with `docker compose up`.
 
-- [x] SQLAlchemy models
-- [x] PostgreSQL connection
-- [x] CRUD endpoints
-- [x] Docker and Docker Compose
-- [x] Automated tests
-- [x] Alembic migrations
-- [x] Health check endpoint
-- [x] GitHub Actions CI
-- [ ] Terraform for VPS provisioning
-- [ ] VPS deployment behind Nginx
-- [ ] Authentication and per-user applications
-- [ ] Web frontend
+**Built:**
 
-**Deliberately not built yet:** there is no authentication, and applications
-are not scoped to a user — anyone with access to the API can read and modify
-every record. That is fine for local single-user use, and is the next thing to
-address before the app is shared.
+- CRUD API over PostgreSQL, with status enforced as a database-level enum
+- Containerised with Docker Compose; data persists in a named volume
+- Schema owned by Alembic migrations, applied automatically on container start
+- Health check endpoint that runs a real query against the database
+- 23 tests against a real Postgres, run on every pull request by GitHub Actions
+- Branch protection on `main` requiring those checks to pass before merge
 
-Tests build their schema with `create_all` rather than by running migrations,
-so a mismatch between `app/models.py` and `alembic/versions/` would not fail
-the suite on its own. CI runs `alembic check` alongside the tests to catch
-exactly that drift.
+**Deliberately out of scope:**
+
+- **Deployment.** Provisioning and hosting — Terraform, Nginx, HTTPS — were
+  planned as a separate phase and are not part of this project.
+- **Authentication.** There is no login, and applications are not scoped to a
+  user, so anyone with API access can read and modify every record. Acceptable
+  for local single-user use; would need solving before hosting.
+- **Frontend.** The API is used through the generated docs at `/docs`.
+
+**Known limitation:** tests build their schema with `create_all` rather than by
+running migrations, so model/migration drift would not fail the suite on its
+own. CI runs `alembic check` alongside the tests to catch exactly that.
