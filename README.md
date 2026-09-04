@@ -178,14 +178,23 @@ machine with `docker compose up`.
 - Health check endpoint that runs a real query against the database
 - 23 tests against a real Postgres, run on every pull request by GitHub Actions
 - Branch protection on `main` requiring those checks to pass before merge
+- **Infrastructure as code** — `infra/` provisions a Hetzner server and
+  firewall with Terraform, and cloud-init installs Docker, starts the stack and
+  configures Nginx on first boot. `terraform apply` to a live API in about 90
+  seconds, `terraform destroy` back to nothing
+
+**Run on demand.** There is no permanently hosted instance. The server is
+created when needed and destroyed afterwards, so it costs nothing at rest —
+a deliberate choice for a personal project, at the price of a new IP address
+on each rebuild. See [`infra/README.md`](infra/README.md).
 
 **Deliberately out of scope:**
 
-- **Deployment.** Provisioning and hosting — Terraform, Nginx, HTTPS — were
-  planned as a separate phase and are not part of this project.
+- **HTTPS.** Certbot needs a domain pointed at a stable address, which the
+  on-demand setup does not provide. Demos run over plain HTTP.
 - **Authentication.** There is no login, and applications are not scoped to a
   user, so anyone with API access can read and modify every record. Acceptable
-  for local single-user use; would need solving before hosting.
+  for single-user use; would need solving before hosting permanently.
 - **Frontend.** The API is used through the generated docs at `/docs`.
 
 **Known limitation:** tests build their schema with `create_all` rather than by

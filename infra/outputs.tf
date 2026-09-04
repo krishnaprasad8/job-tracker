@@ -1,13 +1,13 @@
 output "server_ip" {
-  description = "Reserved IPv4 address. Stable across server rebuilds."
-  value       = hcloud_primary_ip.app.ip_address
+  description = "Public IPv4. Changes on every rebuild."
+  value       = hcloud_server.app.ipv4_address
+}
+
+output "app_url" {
+  description = "Give cloud-init two or three minutes after apply before this responds."
+  value       = "http://${hcloud_server.app.ipv4_address}/docs"
 }
 
 output "ssh_command" {
-  description = "Ready to paste."
-  value       = "ssh root@${hcloud_primary_ip.app.ip_address}"
-}
-
-output "server_status" {
-  value = hcloud_server.app.status
+  value = "ssh root@${hcloud_server.app.ipv4_address}"
 }
