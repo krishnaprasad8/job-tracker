@@ -7,6 +7,10 @@ interview, offer, rejected. FastAPI and PostgreSQL, containerised with Docker
 Compose, schema managed by Alembic migrations, and tested against a real
 database on every pull request.
 
+The server it deploys to is provisioned with **Terraform** and configured by
+**cloud-init** — `terraform apply` goes from nothing to a live, Nginx-fronted
+API in about 90 seconds, and `terraform destroy` takes it back to zero cost.
+
 Replaces the spreadsheet I was keeping by hand.
 
 ## Stack
@@ -17,8 +21,11 @@ Replaces the spreadsheet I was keeping by hand.
 - **Pydantic v2** — request/response validation
 - **Docker Compose** — app and database as containers
 - **Alembic** — versioned schema migrations, applied on container start
-- **pytest** — 23 tests against a real Postgres
+- **pytest** — 28 tests against a real Postgres
 - **GitHub Actions** — tests and migration drift check on every pull request
+- **Terraform** — provisions the Hetzner server and firewall as code
+- **cloud-init** — installs Docker, starts the stack and configures Nginx on
+  first boot, so deployment needs no SSH
 - **Prometheus / Grafana** — `/metrics` endpoint with dashboards defined as code
 
 ## Quick start
@@ -196,8 +203,8 @@ observability/          Prometheus config, Grafana datasource and dashboards
 
 ## Scope
 
-A complete, locally-runnable API. There is no hosted instance — it runs on your
-machine with `docker compose up`.
+Complete and deployable. It runs locally with `docker compose up`, and
+`infra/` provisions and deploys it to a real server on demand.
 
 **Built:**
 
