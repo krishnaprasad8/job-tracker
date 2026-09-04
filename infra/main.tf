@@ -3,16 +3,6 @@ resource "hcloud_ssh_key" "me" {
   public_key = file(pathexpand(var.ssh_public_key_path))
 }
 
-# auto_delete = false is the whole point of this resource: the address is
-# reserved to the account rather than to a server, so tearing the server down
-# between demos keeps the IP and any DNS pointing at it.
-resource "hcloud_primary_ip" "app" {
-  name        = "${var.server_name}-ipv4"
-  type        = "ipv4"
-  location    = var.location
-  auto_delete = false
-}
-
 # Hetzner firewalls deny all inbound traffic that no rule permits, and allow
 # all outbound. Only these three ports are reachable from the internet.
 resource "hcloud_firewall" "app" {
@@ -51,11 +41,16 @@ resource "hcloud_server" "app" {
   ssh_keys     = [hcloud_ssh_key.me.id]
   firewall_ids = [hcloud_firewall.app.id]
 
+  # No reserved Primary IP: the address is created and destroyed with the
+  # server, so nothing bills once the server is gone. The trade-off is a new
+  # IP on every rebuild, which rules out stable DNS.
   public_net {
     ipv4_enabled = true
-    ipv4         = hcloud_primary_ip.app.id
     ipv6_enabled = true
   }
+
+  # Runs on first boot: installs Docker, starts the app, puts Nginx in front.
+  user_data = file("${path.module}/cloud-init.sh")
 
   labels = {
     project = var.server_name
