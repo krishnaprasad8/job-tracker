@@ -1,6 +1,7 @@
 """FastAPI application exposing CRUD endpoints for job applications."""
 
 from fastapi import Depends, FastAPI, HTTPException, Response, status
+from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy import select, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -10,6 +11,10 @@ from app.models import Application
 from app.schemas import ApplicationCreate, ApplicationRead, ApplicationUpdate
 
 app = FastAPI(title="Job Application Tracker")
+
+# Exposes /metrics in Prometheus format: request counts, latency histograms and
+# in-progress requests, labelled by method, path and status code.
+Instrumentator().instrument(app).expose(app, include_in_schema=False)
 
 
 @app.get("/health")

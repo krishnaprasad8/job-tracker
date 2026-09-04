@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: job-tracker
+    metrics_path: /metrics
+    static_configs:
+      # "app" is the Compose service name, resolved on the private network.
+      - targets: ["app:8000"]
